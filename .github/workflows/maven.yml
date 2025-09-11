@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - develop
-      - "feature/**"
+      - 'feature/**'
   pull_request:
 
 jobs:
@@ -22,3 +22,6 @@ jobs:
           distribution: 'temurin'
           java-version: '8.0.362'
           cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
