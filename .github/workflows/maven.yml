@@ -29,7 +29,7 @@ jobs:
       - name: Run Horusec Scan (Docker)
         run: |
           set -euxo pipefail
-          docker run -it --rm \
+          docker run --rm \
             -v "${GITHUB_WORKSPACE}:/src" -w /src \
             horuszup/horusec-cli:v2.9.0-beta.3 \
             sh -lc 'horusec start -D -p . -o json -0 horusec-report.json'
