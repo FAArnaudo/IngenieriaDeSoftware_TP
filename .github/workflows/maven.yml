@@ -25,3 +25,30 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+
+      - name: Run Horusec Scan (Docker)
+        run: |
+          set -euxo pipefail
+          docker run -it --rm \
+            -v "${GITHUB_WORKSPACE}:/src" -w /src \
+            horuszup/horusec-cli:v2.9.0-beta.3 \
+            sh -lc 'horusec start -D -p . -o json -0 horusec-report.json'
+          ls -la horusec-report.json
+          test -f horusec-report.json
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: File pipeline vulnerabilities report
+        run: |
+          test -f horusec-report.json || (echo "horusec-report.json not found!" && exit 1)
+          HIGH_CRIT=$(jq '[.analysisVulnerabilities[]?.vulnerability | select(.severity == "HIGH" or .severity == "CRITICAL")] | length' horusec-report.json)
+          echo "Number of HIGH or CRITICAL vulnerabilities: $HIGH_CRIT"
+          if [ "$HIGH_CRIT" -gt 0 ]; then
+            echo "Found $HIGH_CRIT HIGH or CRITICAL vulnerabilities."
+            exit 1
+          else
+            echo "No HIGH or CRITICAL vulnerabilities found."
+          fi
