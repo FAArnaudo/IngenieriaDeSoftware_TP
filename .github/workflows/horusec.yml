@@ -1,0 +1,43 @@
+name: Java + Horusec analysis
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+jobs:
+  horusec_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure Horusec temp folder exists
+        # Asegura que la carpeta base donde Horusec crea .horusec esté presente
+        run: mkdir -p ./.horusec
+
+      - name: Build project (opcional, si necesitás compilar antes del análisis)
+        run: mvn compile         # o gradle build, lo que uses
+
+      - name: Run Horusec analysis via Docker Compose
+        env:
+          HORUSEC_MAX_CRITICAL_VULNERABILITIES: 15
+          HORUSEC_MAX_HIGH_VULNERABILITIES: 20
+          HORUSEC_MAX_MEDIUM_VULNERABILITIES: 25
+          HORUSEC_MAX_LOW_VULNERABILITIES: 30
+        run: |
+          docker compose -f docker-compose-analysis.yml up --build --abort-on-container-exit --exit-code-from horusec-cli
+
+      - name: Upload Horusec report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: horusec-report
+          path: horusec-report.json
+
+      - name: Docker compose down
+        if: always()
+        run: docker compose -f docker-compose-analysis.yml down --remove-orphans
