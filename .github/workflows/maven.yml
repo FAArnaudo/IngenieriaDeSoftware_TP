@@ -32,7 +32,7 @@ jobs:
           docker run --rm \
             -v "${GITHUB_WORKSPACE}:/src" -w /src \
             horuszup/horusec-cli:v2.9.0-beta.3 \
-            sh -lc 'horusec start -D -p . -o json -0 horusec-report.json'
+            sh -c 'horusec start -p . --output-format json --json-output-file horusec-report.json'
           ls -la horusec-report.json
           test -f horusec-report.json
 
