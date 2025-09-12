@@ -90,8 +90,9 @@ jobs:
             echo "✅ No HIGH/CRITICAL findings."
           fi
 
-      # 8) Upload the Horusec report as an artifact
+      # 8) Always upload the Horusec report (even if the gate failed)
       - name: Upload Horusec report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: horusec-report
