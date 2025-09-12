@@ -1,0 +1,22 @@
+{
+  "horusecCliFilesOrPathsToIgnore": [
+    "**/.git/**",
+    "**/.idea/**",
+    "**/.vscode/**",
+    "**/node_modules/**",
+    "**/target/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/out/**",
+    "**/.venv/**",
+    "**/venv/**",
+    "**/__pycache__/**",
+    "**/.pytest_cache/**",
+    "**/.mvn/**",
+    "**/.gradle/**",
+    "**/logs/**"
+  ],
+  "horusecCliLogLevel": "info",
+  "horusecCliEnableGitHistoryAnalysis": false,
+  "horusecCliReturnErrorIfFoundVulnerability": true
+}
