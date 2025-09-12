@@ -1,71 +1,63 @@
-name: Java CI + Horusec analysis
+name: Java + Horusec Analysis Complete
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
       - develop
-      - 'feature/**'
+      - "feature/*"
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  build_and_scan:
+  build-and-scan:
     runs-on: ubuntu-latest
+
     steps:
-      # Clonar el repositorio
+      # 1️⃣ Clonar el repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Configurar Java (usar JDK 8)
-      - name: Set up JDK 8
+      # 2️⃣ Configurar Java (JDK 8 Temurin)
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '8.0.362'
+          distribution: temurin
+          java-version: 8
           cache: maven
 
-      # Compilar proyecto con Maven
-      - name: Build with Maven
+      # 3️⃣ Compilar proyecto con Maven
+      - name: Build project with Maven
         run: mvn -B package --file pom.xml
 
-      # Ejecutar Horusec CLI sin Docker (-D)
-      - name: Run Horusec Scan (Docker)
-        run: |
-          set -euxo pipefail
-          docker run --rm \
-          -v "${GITHUB_WORKSPACE}:/src" \
-          -v /var/run/docker.sock:/var/run/docker.sock \
-          -w /src \
-          horuszup/horusec-cli:v2.9.0-beta.3 \
-          sh -c 'horusec start -p . --output-format json --json-output-file horusec-report.json'
-          ls -la horusec-report.json
-          test -f horusec-report.json
-
-      - name: Install jq
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-
-      # Ejecutar Horusec CLI sin Docker (-D)
+      # 4️⃣ Ejecutar Horusec CLI sin Docker (-D) y con todas las severidades
       - name: Run Horusec analysis
+        run: |
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/src" -w /src \
+            horuszup/horusec-cli:v2.9.0-beta.3 \
+            sh -c 'horusec start -D -p . \
+              --output-format json \
+              --json-output-file horusec-report.json \
+              --information-severity=true \
+              -t 600'
+
+      # 5️⃣ Chequear vulnerabilidades HIGH o CRITICAL
+      - name: Check for HIGH or CRITICAL vulnerabilities
         run: |
           test -f horusec-report.json || (echo "horusec-report.json not found!" && exit 1)
           HIGH_CRIT=$(jq '[.analysisVulnerabilities[]?.vulnerability | select(.severity == "HIGH" or .severity == "CRITICAL")] | length' horusec-report.json)
           echo "Number of HIGH or CRITICAL vulnerabilities: $HIGH_CRIT"
           if [ "$HIGH_CRIT" -gt 0 ]; then
-            echo "Found $HIGH_CRIT HIGH or CRITICAL vulnerabilities."
+            echo "❌ Found $HIGH_CRIT HIGH or CRITICAL vulnerabilities."
             exit 1
           else
-            echo "No HIGH or CRITICAL vulnerabilities found."
+            echo "✅ No HIGH or CRITICAL vulnerabilities found."
           fi
 
-      # Verificar que se generó el archivo
-      - name: Check Horusec report
-        run: ls -la horusec-report.json
-
-      # Subir el JSON como artifact para poder descargarlo
+      # 6️⃣ Subir el JSON como artifact (siempre)
       - name: Upload Horusec report
+        if: always() # Subir aunque falle el step anterior
         uses: actions/upload-artifact@v4
         with:
           name: horusec-report
