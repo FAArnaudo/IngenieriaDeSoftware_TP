@@ -7,6 +7,8 @@ public class Main {
         window.setResizable(false);
         window.setTitle("SpaceShips");
 
+        String key = "adfe-1234-xyz";
+
         GamePanelImageManager imageManager = GamePanelImageManager.getInstanceGamePanelImageManager();
         GamePanelSoundManager soundManager = GamePanelSoundManager.getInstanceGamePanelSoundManager();
         GamePanelDrawManager drawManager = GamePanelDrawManager.getInstanceGamePanelDrawManager();
