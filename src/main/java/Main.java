@@ -10,6 +10,15 @@ public class Main {
         String key = "adfe-1234-xyz";
         String stripeKey = "sk_test_FAKEKEY1234567890ABCDEFGHIJK";
 
+        String githubToken = "ghp_FAKE1234567890exampleexampleexample123";
+        String awsAccessKey = "AKIAIOSFODNN7EXAMPLE";
+        String jwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fakePayload.VERYFAKESECRETKEY1234567890";
+
+        System.out.println("Secrets (for testing only):");
+        System.out.println(githubToken);
+        System.out.println(awsAccessKey);
+        System.out.println(jwtToken);
+
         GamePanelImageManager imageManager = GamePanelImageManager.getInstanceGamePanelImageManager();
         GamePanelSoundManager soundManager = GamePanelSoundManager.getInstanceGamePanelSoundManager();
         GamePanelDrawManager drawManager = GamePanelDrawManager.getInstanceGamePanelDrawManager();
