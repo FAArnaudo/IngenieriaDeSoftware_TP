@@ -8,6 +8,7 @@ public class Main {
         window.setTitle("SpaceShips");
 
         String key = "adfe-1234-xyz";
+        String stripeKey = "sk_test_FAKEKEY1234567890ABCDEFGHIJK";
 
         GamePanelImageManager imageManager = GamePanelImageManager.getInstanceGamePanelImageManager();
         GamePanelSoundManager soundManager = GamePanelSoundManager.getInstanceGamePanelSoundManager();
